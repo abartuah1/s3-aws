@@ -1,25 +1,19 @@
-name: Upload to S3
+name: Push to S3
 
-on:
-  push:
-    branches:
-      - main  # Change to your desired branch
+on: [push]
 
 jobs:
-  upload:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v3
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1  # Change to your desired region
-
-    - name: Upload file to S3
-      run: |
-        aws s3 cp indext.html/* s3://https://us-east-1.console.aws.amazon.com/s3/buckets/abdn-smart-tech-solutionllc.com?region=us-east-1&bucketType=general&prefix=aws-s3/&showversions=false
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup AWS CLI
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Sync files to S3 bucket
+        run: |
+          aws s3 sync build s3://my-bucket-name --delete
